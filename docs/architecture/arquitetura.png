@@ -1,1 +1,15 @@
-aqui estará a imagem
+graph LR
+    A[USUÁRIO: Aluno, Voluntário, Professor, Gestor] --> B{FRONTEND};
+    B --> C[BACKEND: Microsserviços API];
+    C --> D(BANCO DE DADOS: PostgreSQL);
+    C --> E[APIs Externas];
+    
+    subgraph Frontend
+        B1[App Mobile: Aluno + Voluntário]
+        B2[Web: Professor + Gestor]
+    end
+    
+    subgraph APIs Externas
+        E1[Serviço de Notificação Push]
+        E2[Serviço de Geolocalização]
+    end
