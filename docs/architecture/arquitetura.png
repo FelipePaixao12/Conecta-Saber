@@ -13,3 +13,39 @@ graph LR
         E1[Serviço de Notificação Push]
         E2[Serviço de Geolocalização]
     end
+
+Excelente iniciativa em querer garantir que sua documentação no GitHub esteja completa! Como você não está conseguindo adicionar a imagem da arquitetura diretamente, a melhor solução é utilizar a sintaxe Markdown para a URL da imagem (caso você a hospede em algum lugar como o próprio GitHub ou Imgur) ou, a alternativa mais robusta: descrever a arquitetura em texto puro e usar uma tabela ASCII.
+
+Abaixo, segue a seção formatada em Markdown, pronta para ser copiada e colada no seu arquivo README.md na seção 4. Arquitetura do Sistema.
+
+4. Arquitetura do Sistema (Versão 2D)
+O sistema é composto por frontend (mobile para Aluno/Voluntário e web para Gestão), backend (API), e banco de dados. Utilizamos um modelo de Arquitetura de Microsserviços/Camadas Desacopladas para suportar a complexidade do matchmaking e dos diferentes perfis de usuário.
+
+Visão Geral da Arquitetura do Conecta Saber
+Como não foi possível anexar o diagrama visual, a arquitetura de alto nível segue o fluxo:
+
+Snippet de código
+
+graph LR
+    A[USUÁRIO: Aluno, Voluntário, Professor, Gestor] --> B{FRONTEND};
+    B --> C[BACKEND: Microsserviços API];
+    C --> D(BANCO DE DADOS: PostgreSQL);
+    C --> E[APIs Externas];
+    
+    subgraph Frontend
+        B1[App Mobile: Aluno + Voluntário]
+        B2[Web: Professor + Gestor]
+    end
+    
+    subgraph APIs Externas
+        E1[Serviço de Notificação Push]
+        E2[Serviço de Geolocalização]
+    end
+Legenda dos Componentes Principais:
+
+Camada/Componente	Descrição e Função
+Frontend Mobile	Interface principal para Aluno e Voluntário. Prioriza notificações e agendamento rápido. (Tecnologia: Flutter/React Native).
+Frontend Web	Painel robusto para Professor e Gestor para geração de relatórios e gestão de dados. (Tecnologia: React/Vue.js).
+Backend (API)	Coração do sistema. Responsável pela lógica de Matchmaking, Agendamento e validação de perfis. (Tecnologia: Node.js/Java).
+Banco de Dados	Armazenamento de dados transacionais estruturados, como perfis de usuário, ofertas, agendamentos e frequência. (Tecnologia: PostgreSQL).
+APIs Externas	Serviços de terceiros para funcionalidades auxiliares, como lembretes de aula e rastreamento de localização.
