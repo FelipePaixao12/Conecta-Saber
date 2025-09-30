@@ -1,9 +1,3 @@
-Excelente\! O seu tema **"Conecta Saber"** é robusto e se encaixa perfeitamente na estrutura do README original.
-
-Abaixo está a versão do **README.md** adaptada, substituindo o tema de sustentabilidade urbana pelo seu projeto de **Plataforma de Educação Complementar para Escolas Públicas**.
-
------
-
 # Projeto-ConectaSaber-N705
 
 Repositório do Projeto Aplicado N705 - Documentação técnica e protótipos.
