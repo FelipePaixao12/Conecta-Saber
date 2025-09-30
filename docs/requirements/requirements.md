@@ -1,7 +1,3 @@
-Perfeito\! A especificação de API é uma documentação técnica crucial. Vou adaptar o documento, focando agora nos endpoints essenciais para o **agendamento e gestão** da sua plataforma **Conecta Saber**, substituindo o foco em chatbot/sustentabilidade.
-
------
-
 # Especificação da API – Plataforma Conecta Saber 🧑‍🎓
 
 Este documento detalha a especificação técnica da API **Conecta Saber**, incluindo seus endpoints para gerenciamento de agendamentos, perfis e frequência. Ele serve como um guia para desenvolvedores *frontend* (Web e Mobile) que precisam integrar sistemas com o *backend*.
