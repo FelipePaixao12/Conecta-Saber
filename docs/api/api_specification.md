@@ -1,23 +1,33 @@
-# Especificação da API – App EcoGuia Fortaleza 🌿
+# Especificação da API – Plataforma Conecta Saber 🧑‍🎓
 
-Este documento detalha a especificação técnica da API **App EcoGuia Fortaleza**, incluindo seus endpoints, formatos de requisição e resposta, e os mecanismos de autenticação. Ele serve como um guia para desenvolvedores que precisam integrar sistemas com esta API.
+Este documento detalha a especificação técnica da API **Conecta Saber**, incluindo seus endpoints centrais para **agendamento, frequência e perfis**. Ele serve como um guia para desenvolvedores que constroem as interfaces Mobile (Aluno/Voluntário) e Web (Professor/Gestor).
 
 ## 1\. Endpoints Previstos
 
-### 1.1. `POST /api/ask`
+### 1.1. `POST /api/auth/login`
 
-  * **Descrição**: Envia uma pergunta ao assistente virtual de sustentabilidade e recebe uma resposta. A API processa a pergunta usando a Groq Cloud API e retorna uma resposta contextualizada para a região de Fortaleza.
+  * **Descrição**: Realiza a autenticação de qualquer perfil de usuário (Aluno, Voluntário, Professor, Administrador) e emite um token JWT.
+  * **Autenticação**: Não requer autenticação.
+
+### 1.2. `GET /api/aulas/disponiveis`
+
+  * **Descrição**: Retorna a lista de ofertas de aulas de reforço cadastradas por voluntários, com filtros por disciplina, escola e data. (Endpoint principal para o **Aluno**).
   * **Autenticação**: Requer um token de autenticação (JWT).
 
-### 1.2. `GET /api/health`
+### 1.3. `POST /api/frequencia`
 
-  * **Descrição**: Endpoint de verificação de saúde da API. É usado para monitorar se a aplicação está online e funcional. Não requer autenticação.
+  * **Descrição**: Permite que o **Voluntário** registre a presença e o *feedback* de um Aluno em uma aula concluída (RF04).
+  * **Autenticação**: Requer um token de autenticação (JWT) e autorização de perfil de Voluntário.
+
+### 1.4. `GET /api/health`
+
+  * **Descrição**: Endpoint de verificação de saúde da API. Usado para monitorar se a aplicação está online. Não requer autenticação.
 
 -----
 
 ## 2\. Autenticação e Autorização
 
-A API utiliza o padrão de autenticação por **token**. Para acessar a maioria dos endpoints, o cliente deve incluir um token de autorização no cabeçalho da requisição.
+A API utiliza o padrão de autenticação por **token (JWT)**. Para acessar a maioria dos endpoints, o cliente deve incluir um token de autorização no cabeçalho da requisição.
 
   * **Método**: Bearer Token
   * **Formato**: O token de autenticação (JWT) deve ser enviado no cabeçalho `Authorization`.
@@ -25,17 +35,17 @@ A API utiliza o padrão de autenticação por **token**. Para acessar a maioria 
 **Exemplo de Cabeçalho de Requisição:**
 
 ```
-Authorization: Bearer <seu_token_aqui>
+Authorization: Bearer <seu_token_jwt>
 Content-Type: application/json
 ```
 
-**Observação**: O endpoint `/api/health` não exige autenticação.
+**Observação**: Apenas os endpoints de login e `/api/health` não exigem autenticação.
 
 -----
 
 ## 3\. Detalhamento de Endpoints
 
-### 3.1. `POST /api/ask`
+### 3.1. `POST /api/auth/login`
 
 #### Parâmetros de Requisição
 
@@ -43,13 +53,15 @@ Este endpoint espera um corpo de requisição no formato JSON.
 
 | Parâmetro | Tipo | Obrigatório | Descrição |
 | :--- | :--- | :--- | :--- |
-| `question` | `string` | Sim | A pergunta do usuário sobre sustentabilidade. |
+| `email` | `string` | Sim | E-mail do usuário cadastrado. |
+| `senha` | `string` | Sim | Senha do usuário. |
 
 **Exemplo de Requisição (Body):**
 
 ```json
 {
-  "question": "Como descartar óleo de cozinha usado em Fortaleza?"
+  "email": "aluno.joao@escola.edu.br",
+  "senha": "senhaSegura123"
 }
 ```
 
@@ -57,46 +69,119 @@ Este endpoint espera um corpo de requisição no formato JSON.
 
 ##### Resposta de Sucesso (Status Code: `200 OK`)
 
-A resposta retorna a resposta gerada pelo assistente virtual e o status da operação.
+A resposta retorna o token JWT e os dados básicos do usuário.
 
 **Exemplo de Resposta (Body):**
 
 ```json
 {
-  "resposta": "Em Fortaleza, você pode descartar óleo de cozinha usado em pontos de coleta específicos, como...",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "usuario": {
+    "id": 102,
+    "nome": "João da Silva",
+    "tipo_perfil": "Aluno"
+  },
   "status": "success"
 }
 ```
 
-##### Resposta de Erro (Status Code: `400 Bad Request`)
+##### Resposta de Erro (Status Code: `401 Unauthorized`)
 
-Ocorre quando o formato da requisição é inválido, como a falta do parâmetro `question`.
-
-**Exemplo de Resposta (Body):**
-
-```json
-{
-  "error": "O campo 'question' é obrigatório.",
-  "status": "error"
-}
-```
-
-##### Resposta de Erro (Status Code: `500 Internal Server Error`)
-
-Ocorre quando há um erro interno no servidor ao processar a requisição.
+Ocorre quando as credenciais (e-mail ou senha) são inválidas.
 
 **Exemplo de Resposta (Body):**
 
 ```json
 {
-  "error": "Ocorreu um erro interno ao processar a sua requisição.",
+  "error": "Credenciais inválidas. Verifique seu e-mail e senha.",
   "status": "error"
 }
 ```
 
 -----
 
-### 3.2. `GET /api/health`
+### 3.2. `GET /api/aulas/disponiveis`
+
+#### Parâmetros de Requisição (Query Params)
+
+Este endpoint aceita filtros opcionais via URL.
+
+| Parâmetro | Tipo | Obrigatório | Descrição |
+| :--- | :--- | :--- | :--- |
+| `disciplina` | `string` | Não | Filtra aulas por nome da disciplina (Ex: "Matemática"). |
+| `escola_id` | `integer` | Não | Filtra aulas oferecidas em uma escola parceira específica. |
+| `data` | `date` | Não | Filtra aulas a partir de uma data específica (`YYYY-MM-DD`). |
+
+**Exemplo de Requisição (URL):**
+
+`GET /api/aulas/disponiveis?disciplina=Português&escola_id=5`
+
+#### Formatos de Resposta
+
+##### Resposta de Sucesso (Status Code: `200 OK`)
+
+Retorna uma lista de aulas disponíveis para agendamento.
+
+**Exemplo de Resposta (Body):**
+
+```json
+{
+  "aulas": [
+    {
+      "id_oferta": 201,
+      "disciplina": "Matemática",
+      "data_hora": "2025-10-05T15:00:00Z",
+      "voluntario_nome": "Pedro Alves",
+      "escola_nome": "E.E.F. Maria Helena",
+      "modalidade": "presencial"
+    }
+  ],
+  "total": 15
+}
+```
+
+-----
+
+### 3.3. `POST /api/frequencia`
+
+#### Parâmetros de Requisição
+
+Este endpoint espera um corpo de requisição no formato JSON.
+
+| Parâmetro | Tipo | Obrigatório | Descrição |
+| :--- | :--- | :--- | :--- |
+| `agendamento_id` | `integer` | Sim | ID do Agendamento que está sendo finalizado (PK da tabela `Agendamento`). |
+| `presente` | `boolean` | Sim | Indica se o aluno compareceu à aula. |
+| `feedback` | `string` | Não | Observações do Voluntário sobre o desempenho na aula (máximo 500 caracteres). |
+
+**Exemplo de Requisição (Body):**
+
+```json
+{
+  "agendamento_id": 35,
+  "presente": true,
+  "feedback": "Aluno demonstrou ótimo entendimento em frações e fez todas as atividades propostas."
+}
+```
+
+#### Formatos de Resposta
+
+##### Resposta de Sucesso (Status Code: `201 Created`)
+
+Indica que a frequência e o feedback foram registrados com sucesso na tabela `Frequencia`.
+
+**Exemplo de Resposta (Body):**
+
+```json
+{
+  "mensagem": "Frequência registrada e agendamento concluído com sucesso.",
+  "status": "success"
+}
+```
+
+-----
+
+### 3.4. `GET /api/health`
 
 #### Parâmetros de Requisição
 
@@ -113,9 +198,8 @@ Indica que a API está em pleno funcionamento.
 ```json
 {
   "status": "OK",
-  "timestamp": "2024-09-25T10:00:00.000Z",
-  "version": "1.0.0"
+  "servico": "Conecta Saber API",
+  "timestamp": "2025-09-29T21:39:15.000Z",
+  "version": "1.0.0-mvp"
 }
 ```
-
------
