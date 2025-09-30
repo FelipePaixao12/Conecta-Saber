@@ -1,78 +1,74 @@
-# Modelo de Dados – App EcoGuia Fortaleza 🌱
+# Modelo de Dados – Plataforma Conecta Saber 🧑‍🎓
 
 ## 1\. Introdução
 
-Este documento detalha o **modelo de dados** do **App EcoGuia Fortaleza**. Ele descreve as tabelas, os campos, os tipos de dados e os relacionamentos do banco de dados. O objetivo é criar uma base sólida para as funcionalidades do aplicativo, como cadastro de usuários, gestão de resíduos e engajamento comunitário.
+Este documento detalha o **modelo de dados** da plataforma **Conecta Saber**. Ele descreve as tabelas, os campos, os tipos de dados e os relacionamentos do banco de dados. O objetivo é criar uma base sólida para as funcionalidades de **agendamento de aulas, *matchmaking* de voluntários, gestão de frequência** e **rastreamento de desempenho** educacional.
 
 -----
 
 ## 2\. Visão Geral das Entidades
 
-O banco de dados será composto pelas seguintes tabelas principais:
+O banco de dados será composto pelas seguintes tabelas principais, focadas na gestão de pessoas e agendamentos:
 
-  * **`Usuario`**: Armazena as informações de quem usa o app.
-  * **`PontoColeta`**: Guarda os dados dos locais de descarte de resíduos.
-  * **`Residuo`**: Lista os tipos de lixo que podem ser reciclados.
-  * **`Planta`**: Contém os registros das plantas que cada usuário cadastra.
-  * **`DicaSustentavel`**: Armazena as dicas que os usuários compartilham.
-  * **`Evento`**: Guarda as informações de eventos comunitários.
-  * **`ConteudoEducativo`**: Armazena os artigos e vídeos educativos.
-  * **`PontoResiduo`**: Tabela auxiliar para conectar pontos de coleta com tipos de resíduos.
-  * **`ParticipacaoEvento`**: Tabela auxiliar para registrar a presença de usuários em eventos.
+  * **`Usuario`**: Tabela central de perfis (Aluno, Voluntário, Professor, Admin).
+  * **`Escola`**: Informações das instituições de ensino parceiras.
+  * **`VoluntarioDetalhe`**: Dados específicos de certificação e especialidade dos voluntários.
+  * **`OfertaAula`**: O que o voluntário se propõe a dar (Ex: Matemática, Terças, 15h).
+  * **`Agendamento`**: A instância da aula que um aluno solicitou e foi confirmada.
+  * **`Frequencia`**: O registro de presença e feedback de uma aula agendada.
+  * **`Disciplina`**: Lista de disciplinas que podem ser ensinadas (Ex: Português, Física).
 
 -----
 
 ## 3\. Detalhamento das Entidades e Relacionamentos
 
-Aqui, cada tabela é descrita com seus campos e relacionamentos.
+Aqui, cada tabela é descrita com seus campos e relacionamentos, refletindo a lógica de reforço escolar.
 
 ### `Usuario`
 
-  * **Para que serve:** Armazena os dados básicos dos usuários.
+  * **Para que serve:** Armazena dados de autenticação e tipo de perfil (`aluno`, `voluntario`, `professor`, `admin`).
   * **Relacionamentos:**
-      * Um usuário **pode cadastrar** várias **plantas** (1:N).
-      * Um usuário **pode publicar** várias **dicas sustentáveis** (1:N).
-      * Um usuário **pode participar** de vários **eventos** (N:N, via `ParticipacaoEvento`).
+      * Um usuário possui **um** perfil detalhado (Ex: `VoluntarioDetalhe` ou `AlunoDetalhe`) (1:1).
 
-### `PontoColeta`
+### `Escola`
 
-  * **Para que serve:** Armazena a localização e informações dos ecopontos e outros pontos de descarte.
+  * **Para que serve:** Gerencia as instituições parceiras e suas localizações.
   * **Relacionamentos:**
-      * Um ponto de coleta **pode aceitar** vários **tipos de resíduos** (N:N, via `PontoResiduo`).
+      * Uma escola **está ligada a** vários **professores/alunos** (1:N).
 
-### `Residuo`
+### `VoluntarioDetalhe`
 
-  * **Para que serve:** Lista os tipos de resíduos que o aplicativo gerencia.
+  * **Para que serve:** Guarda informações específicas do voluntário, como status de validação e áreas de conhecimento.
   * **Relacionamentos:**
-      * Um tipo de resíduo **pode ser aceito** em vários **pontos de coleta** (N:N, via `PontoResiduo`).
+      * Um voluntário **pode criar** várias **ofertas de aulas** (1:N).
 
-### `Planta`
+### `OfertaAula`
 
-  * **Para que serve:** Permite que os usuários registrem e acompanhem suas plantas.
+  * **Para que serve:** É o "serviço" de reforço que um voluntário cadastra (Ex: "Matemática básica toda segunda").
   * **Relacionamentos:**
-      * Uma planta **pertence a** um único **usuário** (N:1).
+      * Uma oferta de aula **pode gerar** vários **agendamentos** (1:N).
 
-### `DicaSustentavel`
+### `Agendamento`
 
-  * **Para que serve:** Armazena as dicas compartilhadas pela comunidade.
+  * **Para que serve:** O registro da aula marcada (voluntário X aluno X horário específico). É a entidade central da logística.
   * **Relacionamentos:**
-      * Uma dica **pertence a** um único **usuário** (N:1).
+      * Um agendamento **possui** um único registro de **frequência** (1:1).
 
-### `Evento`
+### `Frequencia`
 
-  * **Para que serve:** Guarda informações sobre os eventos comunitários.
+  * **Para que serve:** Armazena o registro de presença do aluno e o *feedback* do voluntário (RF04).
   * **Relacionamentos:**
-      * Um evento **pode ter** vários **participantes** (N:N, via `ParticipacaoEvento`).
+      * Uma frequência **é registrada para** um único **agendamento** (1:1).
 
-### `ConteudoEducativo`
+### `Disciplina`
 
-  * **Para que serve:** Armazena o material educativo do aplicativo.
+  * **Para que serve:** Lista as disciplinas disponíveis para reforço.
   * **Relacionamentos:**
-      * Não possui relacionamentos diretos com outras tabelas.
+      * Uma disciplina **está ligada a** várias **ofertas de aulas** (1:N).
 
 -----
 
-### 4\. Dicionário de Dados
+## 4\. Dicionário de Dados
 
 Esta seção detalha cada campo das tabelas, especificando o tipo de dado e as restrições.
 
@@ -80,147 +76,138 @@ Esta seção detalha cada campo das tabelas, especificando o tipo de dado e as r
 
 | Campo | Tipo de Dado | Restrições | Descrição |
 | :--- | :--- | :--- | :--- |
-| `id_usuario` | `INT` | PK, AUTO\_INCREMENT | Identificador único do usuário. |
-| `nome` | `VARCHAR(100)` | NOT NULL | Nome completo do usuário. |
-| `email` | `VARCHAR(150)` | NOT NULL, UNIQUE | E-mail do usuário. Usado como login. |
-| `senha_hash` | `VARCHAR(255)` | NOT NULL | Senha criptografada por segurança. |
-| `data_cadastro` | `DATETIME` | NOT NULL | Data e hora em que o usuário se registrou. |
+| `id_usuario` | `INT` | PK, AUTO\_INCREMENT | Identificador único. |
+| `nome` | `VARCHAR(100)` | NOT NULL | Nome completo. |
+| `email` | `VARCHAR(150)` | NOT NULL, UNIQUE | E-mail. Usado como login. |
+| `senha_hash` | `VARCHAR(255)` | NOT NULL | Senha criptografada. |
+| `tipo_perfil` | `ENUM` | NOT NULL | Tipo: 'aluno', 'voluntario', 'professor', 'admin'. |
+| `data_cadastro` | `DATETIME` | NOT NULL | Data e hora de registro. |
 
-#### **Tabela: `PontoColeta`**
-
-| Campo | Tipo de Dado | Restrições | Descrição |
-| :--- | :--- | :--- | :--- |
-| `id_ponto` | `INT` | PK, AUTO\_INCREMENT | Identificador único do ponto de coleta. |
-| `nome_local` | `VARCHAR(100)` | NOT NULL | Nome do local (ex.: Ecoponto, Ponto de Coleta). |
-| `endereco` | `VARCHAR(255)` | | Endereço completo do ponto. |
-| `latitude` | `DECIMAL(10, 8)` | NOT NULL | Coordenada geográfica para localização no mapa. |
-| `longitude` | `DECIMAL(11, 8)` | NOT NULL | Coordenada geográfica para localização no mapa. |
-| `horario_funcionamento`| `VARCHAR(255)` | | Horário de atendimento (texto livre). |
-
-#### **Tabela: `Residuo`**
+#### **Tabela: `Escola`**
 
 | Campo | Tipo de Dado | Restrições | Descrição |
 | :--- | :--- | :--- | :--- |
-| `id_residuo` | `INT` | PK, AUTO\_INCREMENT | Identificador único do tipo de resíduo. |
-| `nome_tipo` | `VARCHAR(50)` | NOT NULL | Nome do resíduo (ex.: Plástico, Óleo, Vidro). |
-| `descricao` | `TEXT` | | Descrição detalhada sobre o material e seu descarte. |
+| `id_escola` | `INT` | PK, AUTO\_INCREMENT | Identificador único da escola. |
+| `nome` | `VARCHAR(100)` | NOT NULL | Nome da instituição. |
+| `endereco` | `VARCHAR(255)` | NOT NULL | Endereço completo. |
+| `diretor_id` | `INT` | FK | Chave estrangeira para o usuário que é diretor/gestor da escola. |
 
-#### **Tabela: `Planta`**
-
-| Campo | Tipo de Dado | Restrições | Descrição |
-| :--- | :--- | :--- | :--- |
-| `id_planta` | `INT` | PK, AUTO\_INCREMENT | Identificador único da planta. |
-| `id_usuario` | `INT` | FK, NOT NULL | Chave estrangeira para `Usuario`. Relaciona a planta ao seu dono. |
-| `nome_popular` | `VARCHAR(100)` | NOT NULL | Nome comum da planta. |
-| `nome_cientifico` | `VARCHAR(100)` | | Nome científico da planta (opcional). |
-| `data_plantio` | `DATE` | | Data em que a planta foi plantada. |
-
-#### **Tabela: `DicaSustentavel`**
+#### **Tabela: `VoluntarioDetalhe`**
 
 | Campo | Tipo de Dado | Restrições | Descrição |
 | :--- | :--- | :--- | :--- |
-| `id_dica` | `INT` | PK, AUTO\_INCREMENT | Identificador único da dica. |
-| `id_usuario` | `INT` | FK, NOT NULL | Chave estrangeira para `Usuario`. Relaciona a dica ao seu autor. |
-| `descricao` | `TEXT` | NOT NULL | Conteúdo da dica sustentável. |
-| `data_publicacao` | `DATETIME` | NOT NULL | Data e hora da publicação. |
+| `id_usuario` | `INT` | PK, FK, NOT NULL | Chave primária e estrangeira para `Usuario`. |
+| `cpf` | `VARCHAR(11)` | UNIQUE | CPF para validação de segurança. |
+| `formacao` | `VARCHAR(150)` | | Área de formação ou estudo. |
+| `status_validacao` | `ENUM` | NOT NULL | Status: 'pendente', 'aprovado', 'rejeitado'. |
 
-#### **Tabela: `Evento`**
-
-| Campo | Tipo de Dado | Restrições | Descrição |
-| :--- | :--- | :--- | :--- |
-| `id_evento` | `INT` | PK, AUTO\_INCREMENT | Identificador único do evento. |
-| `titulo` | `VARCHAR(150)` | NOT NULL | Título do evento. |
-| `descricao` | `TEXT` | NOT NULL | Descrição detalhada do evento. |
-| `data_evento` | `DATETIME` | NOT NULL | Data e hora de início do evento. |
-| `local` | `VARCHAR(255)` | NOT NULL | Endereço ou nome do local. |
-
-#### **Tabela: `ConteudoEducativo`**
+#### **Tabela: `Disciplina`**
 
 | Campo | Tipo de Dado | Restrições | Descrição |
 | :--- | :--- | :--- | :--- |
-| `id_conteudo` | `INT` | PK, AUTO\_INCREMENT | Identificador único do conteúdo. |
-| `titulo` | `VARCHAR(150)` | NOT NULL | Título do artigo ou vídeo. |
-| `descricao` | `TEXT` | | Descrição ou resumo do conteúdo. |
-| `url_conteudo` | `VARCHAR(255)` | | URL para o conteúdo (vídeo, artigo externo). |
-| `categoria` | `VARCHAR(50)` | | Categoria do conteúdo (ex.: "reciclagem"). |
+| `id_disciplina` | `INT` | PK, AUTO\_INCREMENT | Identificador único. |
+| `nome` | `VARCHAR(50)` | NOT NULL, UNIQUE | Nome da disciplina (Ex: Matemática, Português). |
+
+#### **Tabela: `OfertaAula`**
+
+| Campo | Tipo de Dado | Restrições | Descrição |
+| :--- | :--- | :--- | :--- |
+| `id_oferta` | `INT` | PK, AUTO\_INCREMENT | Identificador único da oferta. |
+| `voluntario_id` | `INT` | FK, NOT NULL | Chave estrangeira para o `Usuario` Voluntário. |
+| `disciplina_id` | `INT` | FK, NOT NULL | Chave estrangeira para a `Disciplina` oferecida. |
+| `dia_semana` | `ENUM` | NOT NULL | Dia da semana em que a aula é ofertada (Ex: Seg, Ter). |
+| `horario_inicio` | `TIME` | NOT NULL | Hora de início da oferta. |
+| `modalidade` | `ENUM` | NOT NULL | 'presencial' ou 'online'. |
+
+#### **Tabela: `Agendamento`**
+
+| Campo | Tipo de Dado | Restrições | Descrição |
+| :--- | :--- | :--- | :--- |
+| `id_agendamento` | `INT` | PK, AUTO\_INCREMENT | Identificador único do agendamento. |
+| `oferta_id` | `INT` | FK, NOT NULL | Chave estrangeira para a `OfertaAula` que originou o agendamento. |
+| `aluno_id` | `INT` | FK, NOT NULL | Chave estrangeira para o `Usuario` Aluno. |
+| `data_agendada` | `DATETIME` | NOT NULL | Data e hora exata da aula. |
+| `status` | `ENUM` | NOT NULL | 'pendente', 'confirmado', 'cancelado', 'concluido'. |
+| `local_aula` | `VARCHAR(255)` | | O local onde a aula será realizada (sala/link). |
+
+#### **Tabela: `Frequencia`**
+
+| Campo | Tipo de Dado | Restrições | Descrição |
+| :--- | :--- | :--- | :--- |
+| `agendamento_id` | `INT` | PK, FK, NOT NULL | Chave primária e estrangeira para `Agendamento`. |
+| `status_presenca` | `ENUM` | NOT NULL | 'presente', 'falta\_justificada', 'falta\_injustificada'. |
+| `feedback_voluntario` | `TEXT` | | Observações do voluntário sobre o desempenho do aluno (RF04). |
+| `data_registro` | `DATETIME` | NOT NULL | Data e hora do registro. |
 
 -----
 
 ## 5\. Diagrama Entidade-Relacionamento (DER)
 
-Este diagrama visualiza a estrutura do banco de dados, mostrando as tabelas e como elas se conectam.
+Este diagrama visualiza a estrutura do banco de dados, mostrando as tabelas e seus relacionamentos, focado na gestão educacional.
 
 ```mermaid
 erDiagram
-    USUARIO ||--o{ PLANTA : "cadastra"
-    USUARIO ||--o{ DICA_SUSTENTAVEL : "publica"
-    USUARIO }o--o{ PARTICIPACAO_EVENTO : ""
-    PARTICIPACAO_EVENTO }o--|| EVENTO : "participa"
-    PONTO_COLETA }o--o{ PONTO_RESIDUO : ""
-    PONTO_RESIDUO }o--o{ RESIDUO : "aceita"
-
+    USUARIO ||--o{ ESCOLA : "gerencia"
+    ESCOLA ||--o{ USUARIO : "pertence_a"
+    USUARIO ||--|{ VOLUNTARIO_DETALHE : "detalha_perfil"
+    
     USUARIO {
         int id_usuario PK
         string nome
         string email
         string senha_hash
-        datetime data_cadastro
+        enum tipo_perfil
     }
-
-    PLANTA {
-        int id_planta PK
-        int id_usuario FK
-        string nome_popular
-        string nome_cientifico
-        date data_plantio
-    }
-
-    DICA_SUSTENTAVEL {
-        int id_dica PK
-        int id_usuario FK
-        text descricao
-        datetime data_publicacao
-    }
-
-    EVENTO {
-        int id_evento PK
-        string titulo
-        string descricao
-        datetime data_evento
-        string local
-    }
-
-    PARTICIPACAO_EVENTO {
-        int id_usuario FK
-        int id_evento FK
-        datetime data_confirmacao
-    }
-
-    PONTO_COLETA {
-        int id_ponto PK
-        string nome_local
+    
+    ESCOLA {
+        int id_escola PK
+        string nome
         string endereco
-        decimal latitude
-        decimal longitude
-        string horario_funcionamento
+        int diretor_id FK
     }
-
-    RESIDUO {
-        int id_residuo PK
-        string nome_tipo
-        text descricao
+    
+    VOLUNTARIO_DETALHE {
+        int id_usuario PK, FK
+        string cpf UNIQUE
+        string formacao
+        enum status_validacao
     }
-
-    PONTO_RESIDUO {
-        int id_ponto FK
-        int id_residuo FK
+    
+    VOLUNTARIO_DETALHE ||--o{ OFERTA_AULA : "cria_oferta"
+    DISCIPLINA ||--o{ OFERTA_AULA : "é_sobre"
+    
+    OFERTA_AULA {
+        int id_oferta PK
+        int voluntario_id FK
+        int disciplina_id FK
+        enum dia_semana
+        time horario_inicio
+        enum modalidade
     }
-
-    CONTEUDO_EDUCATIVO {
-        int id_conteudo PK
-        string titulo
-        text descricao
-        string url_conteudo
-        string categoria
+    
+    USUARIO ||--o{ AGENDAMENTO : "solicita_ou_é_aluno"
+    OFERTA_AULA ||--o{ AGENDAMENTO : "origina"
+    
+    AGENDAMENTO {
+        int id_agendamento PK
+        int oferta_id FK
+        int aluno_id FK
+        datetime data_agendada
+        enum status
+        string local_aula
+    }
+    
+    AGENDAMENTO ||--|| FREQUENCIA : "possui"
+    
+    FREQUENCIA {
+        int agendamento_id PK, FK
+        enum status_presenca
+        text feedback_voluntario
+        datetime data_registro
+    }
+    
+    DISCIPLINA {
+        int id_disciplina PK
+        string nome UNIQUE
     }
 ```
