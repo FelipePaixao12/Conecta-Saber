@@ -1,90 +1,194 @@
-# Requirements – App EcoGuia Fortaleza 🌱
+Perfeito\! A especificação de API é uma documentação técnica crucial. Vou adaptar o documento, focando agora nos endpoints essenciais para o **agendamento e gestão** da sua plataforma **Conecta Saber**, substituindo o foco em chatbot/sustentabilidade.
 
-## 1. Introdução
+-----
 
-O **App EcoGuia Fortaleza** é uma plataforma com o objetivo de auxiliar a população na gestão de resíduos, incentivar a jardinagem urbana e promover o engajamento comunitário em iniciativas sustentáveis. Este documento detalha os requisitos e as funcionalidades do sistema, servindo como guia para as equipes de desenvolvimento, design e testes.
+# Especificação da API – Plataforma Conecta Saber 🧑‍🎓
 
----
+Este documento detalha a especificação técnica da API **Conecta Saber**, incluindo seus endpoints para gerenciamento de agendamentos, perfis e frequência. Ele serve como um guia para desenvolvedores *frontend* (Web e Mobile) que precisam integrar sistemas com o *backend*.
 
-## 2. Perfis de Usuários (Personas)
+## 1\. Endpoints Previstos
 
-Para garantir que o aplicativo atenda às necessidades de seu público, definimos os seguintes perfis de usuário:
+### 1.1. `POST /api/auth/login`
 
-* **Maria, a Engajada Ambiental:** Jovem de 25 anos, estudante, moradora da área de lazer do Cocó. Quer encontrar pontos de coleta de lixo eletrônico, participar de ações de limpeza de praias e trocar dicas de sustentabilidade. Usa o celular para tudo e valoriza aplicativos com design intuitivo e comunidades ativas.
-* **Carlos, o Jardineiro Iniciante:** Homem de 45 anos, pai de família, morador do Messejana. Começou a cultivar uma horta em casa e precisa de ajuda para saber como cuidar das plantas, fazer compostagem e identificar pragas. Não tem muito tempo, então precisa de informações rápidas e diretas.
-* **Ana, a Zeladora do Lar:** Mulher de 60 anos, aposentada, moradora do bairro Parangaba. Sempre reciclou e quer achar um jeito fácil de saber onde descartar resíduos específicos, como óleo de cozinha e pilhas, sem ter que ir longe de casa. Prefere interfaces simples e com textos em letras maiores.
+  * **Descrição**: Realiza a autenticação de qualquer perfil de usuário (Aluno, Voluntário, Professor, Administrador) e emite um token JWT.
+  * **Autenticação**: Não requer autenticação (é o ponto de entrada).
 
----
+### 1.2. `GET /api/aulas/disponiveis`
 
-## 3. Requisitos Funcionais (RF)
+  * **Descrição**: Retorna a lista de ofertas de aulas de reforço cadastradas por voluntários, permitindo filtros por disciplina e escola. Este é o endpoint principal para o **Aluno**.
+  * **Autenticação**: Requer um token de autenticação (JWT).
 
-Os requisitos a seguir descrevem as funcionalidades que o aplicativo deve oferecer:
+### 1.3. `POST /api/agendamentos`
 
-* **RF01 – Gestão de Resíduos:** O sistema deve permitir que o usuário pesquise e localize pontos de coleta de resíduos (ecopontos, pontos de recebimento de eletrônicos, etc.) por tipo de material, bairro ou proximidade.
-* **RF02 – Informações de Descarte:** O aplicativo deve exibir uma página detalhada para cada tipo de resíduo, informando o que pode ser reciclado, o processo de descarte correto e os pontos de coleta associados.
-* **RF03 – Cadastro e Monitoramento de Plantas:** O usuário deve poder cadastrar plantas em seu "jardim virtual", com informações como nome popular, nome científico e data de plantio.
-* **RF04 – Calendário de Cuidados:** O sistema deve gerar um calendário personalizado de cuidados para cada planta cadastrada, incluindo alertas para rega, adubação e poda.
-* **RF05 – Conteúdo Educativo:** O aplicativo deve disponibilizar uma biblioteca de conteúdos educativos sobre sustentabilidade, como artigos, vídeos e infográficos sobre compostagem, jardinagem e reciclagem.
-* **RF06 – Eventos Comunitários:** O aplicativo deve ter um calendário de eventos comunitários (mutirões de limpeza, feiras orgânicas, oficinas) onde os usuários podem confirmar presença e obter informações de localização.
+  * **Descrição**: Permite que o Aluno solicite o agendamento de uma aula disponível (RF02) ou que o Voluntário aceite uma solicitação de *matchmaking*.
+  * **Autenticação**: Requer um token de autenticação (JWT).
 
----
+### 1.4. `POST /api/frequencia`
 
-## 4. Histórias de Usuário
+  * **Descrição**: Permite que o Voluntário registre a frequência de um Aluno em uma aula concluída (RF04).
+  * **Autenticação**: Requer um token de autenticação (JWT) e autorização específica de **Voluntário**.
 
-Essas histórias descrevem a motivação por trás de cada funcionalidade, conectando os requisitos diretamente com as necessidades dos usuários:
+-----
 
-* **HU01 – Localizar Ecoponto:** Como a **Maria**, eu quero localizar o ecoponto mais próximo, para que eu possa descartar minhas garrafas plásticas corretamente.
-* **HU02 – Criar Meu Jardim:** Como o **Carlos**, eu quero cadastrar as plantas que tenho, para que eu possa acompanhar o desenvolvimento delas e saber como cuidar.
-* **HU03 – Compartilhar Dica:** Como a **Maria**, eu quero publicar fotos da minha horta, para que eu possa compartilhar dicas de cultivo com a comunidade.
-* **HU04 – Saber o que Reciclar:** Como a **Ana**, eu quero saber o que fazer com óleo de cozinha usado, para que eu não descarte de forma incorreta.
+## 2\. Autenticação e Autorização
 
----
+A API utiliza o padrão de autenticação por **token (JWT)** para garantir que apenas usuários válidos possam acessar os dados.
 
-## 5. Regras de Negócio
+  * **Método**: Bearer Token
+  * **Formato**: O token de autenticação (JWT) deve ser obtido após o login e enviado no cabeçalho `Authorization`.
 
-Estas regras definem as políticas e os processos que governam as funcionalidades do aplicativo:
+**Exemplo de Cabeçalho de Requisição (Para endpoints seguros):**
 
-* **RN01:** Todo novo usuário deve se cadastrar com e-mail válido e senha, aceitando os termos de uso.
-* **RN02:** Posts com linguagem ofensiva ou que infrinjam os termos de uso serão moderados e removidos pelos administradores.
-* **RN03:** A localização dos pontos de coleta de resíduos deve ser verificada e atualizada mensalmente por um administrador para garantir a precisão das informações.
-* **RN04:** As notificações sobre cuidados com as plantas devem ser enviadas apenas para os usuários que optarem por essa funcionalidade.
+```
+Authorization: Bearer <seu_token_jwt>
+Content-Type: application/json
+```
 
----
+**Observação**: O endpoint de login (`/api/auth/login`) e o de verificação de saúde (`/api/health`) não exigem autenticação.
 
-## 6. Requisitos Não-Funcionais (RNF)
+-----
 
-Estes requisitos especificam como o sistema deve funcionar, focando em suas qualidades:
+## 3\. Detalhamento de Endpoints
 
-* **RNF01 – Usabilidade:** A interface deve ser simples, intuitiva e acessível para usuários de todas as faixas etárias, seguindo as diretrizes de acessibilidade (WCAG 2.1).
-* **RNF02 – Desempenho:** O aplicativo deve carregar em no máximo 5 segundos em uma conexão 4G e responder às ações do usuário em menos de 1 segundo.
-* **RNF03 – Segurança:** O sistema deve proteger os dados pessoais dos usuários em conformidade com a LGPD e criptografar as senhas armazenadas no banco de dados.
-* **RNF04 – Portabilidade:** O aplicativo deve funcionar em dispositivos Android (versão 9 ou superior) e iOS (versão 14 ou superior).
-* **RNF05 – Manutenibilidade:** O código-fonte deve ser modular e bem documentado, permitindo que a equipe de desenvolvimento adicione novas funcionalidades e corrija bugs com facilidade.
+### 3.1. `POST /api/auth/login`
 
----
+#### Parâmetros de Requisição
 
-## 7. Restrições e Critérios de Aceitação
+| Parâmetro | Tipo | Obrigatório | Descrição |
+| :--- | :--- | :--- | :--- |
+| `email` | `string` | Sim | E-mail do usuário cadastrado. |
+| `senha` | `string` | Sim | Senha do usuário. |
 
-* **Restrição:** O projeto inicial será focado exclusivamente em dados da cidade de Fortaleza, com a arquitetura preparada para uma futura expansão para outras cidades.
-* **Critério de Aceitação:** Para que o projeto seja considerado concluído, o usuário deve conseguir cadastrar uma planta e receber uma notificação de cuidado em até 24 horas.
-* **Critério de Aceitação:** O aplicativo deve ser testado em um mínimo de três modelos de smartphones diferentes (Android e iOS) para garantir a compatibilidade e a qualidade da experiência do usuário.
+**Exemplo de Requisição (Body):**
 
----
+```json
+{
+  "email": "professor.maria@escola.edu.br",
+  "senha": "senhaSegura123"
+}
+```
 
-## 8. Glossário e Definições
+#### Formatos de Resposta (Sucesso)
 
-Esta seção lista os termos técnicos e específicos utilizados neste documento, visando garantir a clareza e o alinhamento de toda a equipe do projeto.
+##### Resposta de Sucesso (Status Code: `200 OK`)
 
-* **Compostagem:** Processo biológico de decomposição da matéria orgânica, como restos de alimentos e folhas, transformando-a em adubo natural.
+A resposta retorna o token JWT e os dados básicos do usuário.
 
-* **LGPD (Lei Geral de Proteção de Dados):** Legislação brasileira que regula a coleta, o armazenamento e o tratamento de dados pessoais.
+**Exemplo de Resposta (Body):**
 
-* **WCAG 2.1 (Web Content Accessibility Guidelines 2.1):** Conjunto de diretrizes internacionais para tornar conteúdos da internet acessíveis a pessoas com deficiência.
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "usuario": {
+    "id": 101,
+    "nome": "Maria de Fátima",
+    "tipo_perfil": "Professor"
+  }
+}
+```
 
-* **UX (User Experience - Experiência do Usuário):** Foco na forma como o usuário interage com um produto, abrangendo sentimentos, atitudes e percepções.
+-----
 
-* **UI (User Interface - Interface do Usuário):** Foco nos elementos visuais do produto, como cores, botões e tipografia, que permitem a interação do usuário.
+### 3.2. `GET /api/aulas/disponiveis`
 
+#### Parâmetros de Requisição (Query Params)
 
+| Parâmetro | Tipo | Obrigatório | Descrição |
+| :--- | :--- | :--- | :--- |
+| `disciplina` | `string` | Não | Filtra aulas por nome da disciplina (Ex: "Matemática"). |
+| `escola_id` | `integer` | Não | Filtra aulas oferecidas em uma escola específica. |
+| `data` | `date` | Não | Filtra aulas a partir de uma data específica (`YYYY-MM-DD`). |
 
+**Exemplo de Requisição (URL):**
 
+`GET /api/aulas/disponiveis?disciplina=Português&escola_id=5`
+
+#### Formatos de Resposta (Sucesso)
+
+##### Resposta de Sucesso (Status Code: `200 OK`)
+
+Retorna uma lista paginada de aulas disponíveis.
+
+**Exemplo de Resposta (Body):**
+
+```json
+{
+  "aulas": [
+    {
+      "id": 201,
+      "disciplina": "Matemática",
+      "data_hora": "2025-10-05T15:00:00Z",
+      "local": "Escola X - Sala 3",
+      "voluntario_nome": "João Silva",
+      "vagas_restantes": 5
+    }
+  ],
+  "total": 15
+}
+```
+
+-----
+
+### 3.3. `POST /api/frequencia`
+
+#### Parâmetros de Requisição
+
+Este endpoint espera um corpo de requisição no formato JSON.
+
+| Parâmetro | Tipo | Obrigatório | Descrição |
+| :--- | :--- | :--- | :--- |
+| `agendamento_id` | `integer` | Sim | ID do agendamento que está sendo encerrado. |
+| `aluno_id` | `integer` | Sim | ID do aluno cuja frequência será registrada. |
+| `presente` | `boolean` | Sim | Indica se o aluno compareceu à aula. |
+| `feedback` | `string` | Não | Observações do Voluntário sobre o desempenho ou a aula (máximo 500 caracteres). |
+
+**Exemplo de Requisição (Body):**
+
+```json
+{
+  "agendamento_id": 35,
+  "aluno_id": 102,
+  "presente": true,
+  "feedback": "Aluno demonstrou ótimo entendimento em frações."
+}
+```
+
+#### Formatos de Resposta (Sucesso)
+
+##### Resposta de Sucesso (Status Code: `201 Created`)
+
+Indica que a frequência e o feedback foram registrados com sucesso.
+
+**Exemplo de Resposta (Body):**
+
+```json
+{
+  "mensagem": "Frequência registrada com sucesso.",
+  "status": "success"
+}
+```
+
+-----
+
+### 3.4. `GET /api/health`
+
+#### Parâmetros de Requisição
+
+Este endpoint não requer nenhum parâmetro.
+
+#### Formatos de Resposta
+
+##### Resposta de Sucesso (Status Code: `200 OK`)
+
+Indica que a API está em pleno funcionamento.
+
+**Exemplo de Resposta (Body):**
+
+```json
+{
+  "status": "OK",
+  "servico": "Conecta Saber API",
+  "timestamp": "2025-09-29T12:00:00.000Z",
+  "version": "1.0.0-mvp"
+}
+```
